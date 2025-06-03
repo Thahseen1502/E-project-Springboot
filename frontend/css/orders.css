@@ -1,0 +1,131 @@
+/* Container for the order page */
+.container {
+    text-align: center;
+    padding: 20px;
+}
+
+/* Title of the order service page */
+h1 {
+    color: #333;
+    margin-bottom: 40px;
+    font-size: 2rem;
+}
+
+/* Form container for adding new order */
+.form-container {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Title for the add order form */
+h2 {
+    color: #333;
+}
+
+/* Styling for the form inputs and button */
+input {
+    margin: 10px;
+    padding: 10px;
+    width: 250px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #008CBA;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #007B9A;
+}
+
+/* Order list container */
+.order-list {
+    margin-top: 40px;
+}
+
+/* Container for order cards */
+.order-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+/* Styling individual order cards */
+.order-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 250px;
+    text-align: center;
+}
+
+/* Order ID styling */
+.order-card h3 {
+    font-size: 1.5rem;
+    color: #333;
+}
+
+/* Order details styling */
+.order-card p {
+    font-size: 1rem;
+    color: #666;
+}
+
+/* Order status styling */
+.order-card .status {
+    font-size: 1rem;
+    color: #4CAF50;
+}
+
+/* Order total price styling */
+.order-card .total-price {
+    font-size: 1.2rem;
+    color: #008CBA;
+}
+
+/* Order date styling */
+.order-card .order-date {
+    font-size: 1rem;
+    color: #777;
+}
+
+.edit-btn, .delete-btn {
+    margin-top: 10px;
+    margin-right: 5px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.edit-btn {
+    background-color: #ffc107;
+    color: #fff;
+}
+
+.delete-btn {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.edit-btn:hover {
+    background-color: #e0a800;
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
+}

@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package order;
+
+option java_package = "com.e_project.order_service.grpc";
+option java_outer_classname = "OrderProto";
+
+// Order message definition
+message Order {
+  int64 id = 1;
+  int64 user_id = 2;
+  int64 product_id = 3;
+  int32 quantity = 4;
+  double total_price = 5;
+  string status = 6;
+  string order_date = 7; // ISO 8601 format: "2023-12-01T10:30:00"
+}
+
+// Request messages
+message GetOrderByIdRequest {
+  int64 id = 1;
+}
+
+message CreateOrderRequest {
+  int64 user_id = 1;
+  int64 product_id = 2;
+  int32 quantity = 3;
+}
+
+message UpdateOrderRequest {
+  int64 id = 1;
+  int64 user_id = 2;
+  int64 product_id = 3;
+  int32 quantity = 4;
+  string status = 5;
+}
+
+message DeleteOrderRequest {
+  int64 id = 1;
+}
+
+message GetAllOrdersRequest {
+  // Empty request for getting all orders
+}
+
+message GetOrdersByUserIdRequest {
+  int64 user_id = 1;
+}
+
+// Response messages
+message OrderResponse {
+  Order order = 1;
+  bool success = 2;
+  string message = 3;
+}
+
+message OrdersResponse {
+  repeated Order orders = 1;
+  bool success = 2;
+  string message = 3;
+}
+
+message DeleteOrderResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Order Service Definition
+service OrderService {
+  rpc GetAllOrders(GetAllOrdersRequest) returns (OrdersResponse);
+  rpc GetOrderById(GetOrderByIdRequest) returns (OrderResponse);
+  rpc GetOrdersByUserId(GetOrdersByUserIdRequest) returns (OrdersResponse);
+  rpc CreateOrder(CreateOrderRequest) returns (OrderResponse);
+  rpc UpdateOrder(UpdateOrderRequest) returns (OrderResponse);
+  rpc DeleteOrder(DeleteOrderRequest) returns (DeleteOrderResponse);
+}

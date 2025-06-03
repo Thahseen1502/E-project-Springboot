@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package product;
+
+option java_package = "com.e_project.product_service.grpc";
+option java_outer_classname = "ProductProto";
+
+// Product message definition
+message Product {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  double price = 4;
+  int32 stock = 5;
+}
+
+// Request messages
+message GetProductByIdRequest {
+  int64 id = 1;
+}
+
+message CreateProductRequest {
+  string name = 1;
+  string description = 2;
+  double price = 3;
+  int32 stock = 4;
+}
+
+message UpdateProductRequest {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  double price = 4;
+  int32 stock = 5;
+}
+
+message DeleteProductRequest {
+  int64 id = 1;
+}
+
+message GetAllProductsRequest {
+  // Empty request for getting all products
+}
+
+// Response messages
+message ProductResponse {
+  Product product = 1;
+  bool success = 2;
+  string message = 3;
+}
+
+message ProductsResponse {
+  repeated Product products = 1;
+  bool success = 2;
+  string message = 3;
+}
+
+message DeleteProductResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Product Service Definition
+service ProductService {
+  rpc GetAllProducts(GetAllProductsRequest) returns (ProductsResponse);
+  rpc GetProductById(GetProductByIdRequest) returns (ProductResponse);
+  rpc CreateProduct(CreateProductRequest) returns (ProductResponse);
+  rpc UpdateProduct(UpdateProductRequest) returns (ProductResponse);
+  rpc DeleteProduct(DeleteProductRequest) returns (DeleteProductResponse);
+}

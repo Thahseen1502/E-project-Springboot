@@ -1,0 +1,166 @@
+version: '3.8'
+
+services:
+  user-db:
+    image: postgres:15
+    container_name: user-db
+    environment:
+      POSTGRES_DB: userdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postroot
+    ports:
+      - "5433:5432"
+    volumes:
+      - user_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    restart: unless-stopped
+
+  product-db:
+    image: postgres:15
+    container_name: product-db
+    environment:
+      POSTGRES_DB: productdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postroot
+    ports:
+      - "5434:5432"
+    volumes:
+      - product_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    restart: unless-stopped
+
+  order-db:
+    image: postgres:15
+    container_name: order-db
+    environment:
+      POSTGRES_DB: orderdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postroot
+    ports:
+      - "5435:5432"
+    volumes:
+      - order_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    restart: unless-stopped
+
+  eureka-server:
+    build: ./eureka-service
+    ports:
+      - "8761:8761"
+    networks:
+      - backend
+    restart: unless-stopped
+
+  user-service:
+    build: ./user-service
+    ports:
+      - "8081:8081"
+      - "9091:9091"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://user-db:5432/userdb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postroot
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+    depends_on:
+      - user-db
+      - eureka-server
+    networks:
+      - backend
+    restart: unless-stopped
+
+  product-service:
+    build: ./product-service
+    ports:
+      - "8082:8082"
+      - "9092:9092"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://product-db:5432/productdb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postroot
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+    depends_on:
+      - product-db
+      - eureka-server
+    networks:
+      - backend
+    restart: unless-stopped
+
+  order-service:
+    build: ./order-service
+    ports:
+      - "8083:8083"
+      - "9093:9093"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://order-db:5432/orderdb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postroot
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+    depends_on:
+      - order-db
+      - eureka-server
+    networks:
+      - backend
+    restart: unless-stopped
+
+  api-gateway:
+    build: ./api-gateway-service
+    ports:
+      - "8000:8000"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - SPRING_APPLICATION_NAME=api-gateway-service
+    depends_on:
+      - user-service
+      - product-service
+      - order-service
+    networks:
+      - backend
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    networks:
+       - backend
+    depends_on:
+      - api-gateway
+    restart: unless-stopped
+
+
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    ports:
+      - "8888:443"
+      - "8889:8889"
+
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./frontend:/usr/share/caddy
+      - caddy_data:/data        # Add persistent storage for certificates
+      - caddy_config:/config    # Add persistent storage for config
+    depends_on:
+      - api-gateway
+      - frontend
+    networks:
+      - backend
+    restart: unless-stopped
+
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  user_data:
+  product_data:
+  order_data:
+  caddy_data: # Add Caddy data volume
+  caddy_config:    # Add Caddy config volume
+
+

@@ -1,0 +1,33 @@
+localhost {
+    root * /usr/share/caddy
+    file_server
+
+    handle /api/* {
+        reverse_proxy http://api-gateway:8000
+    }
+
+    tls internal
+}
+
+
+
+# HTTP endpoint specifically for Flutter development
+:8889 {
+    handle /api/* {
+        reverse_proxy http://api-gateway:8000 {
+            header_up Host {upstream_hostport}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+
+
+    # Handle preflight requests
+    @options {
+        method OPTIONS
+    }
+    respond @options 204
+
+
+}
