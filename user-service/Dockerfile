@@ -8,14 +8,33 @@
 #
 #
 
-# Use OpenJDK 17 as base image
+# Multi-stage build
+# Stage 1: Build the application
+FROM maven:3.8.6-openjdk-17-slim AS build
+
+# Set working directory
+WORKDIR /app
+
+# Copy pom.xml first (for better caching)
+COPY pom.xml .
+
+# Download dependencies
+RUN mvn dependency:go-offline -B
+
+# Copy source code
+COPY src ./src
+
+# Build the application
+RUN mvn clean package -DskipTests
+
+# Stage 2: Run the application
 FROM openjdk:17-jdk-slim
 
 # Set working directory
 WORKDIR /app
 
-# Copy the JAR file
-COPY target/*.jar user-service.jar
+# Copy the JAR file from build stage
+COPY --from=build /app/target/*.jar user-service.jar
 
 # Expose the port
 EXPOSE 8081
