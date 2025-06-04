@@ -7,7 +7,7 @@
 # Step 1: Build the JAR
 FROM maven:3.9.6-eclipse-temurin-17 as build
 WORKDIR /app
-COPY . .
+COPY api-gateway-service /app
 RUN mvn clean package -DskipTests
 
 # Step 2: Run the JAR
@@ -16,3 +16,4 @@ VOLUME /tmp
 EXPOSE 8000
 COPY --from=build /app/target/api-gateway-service-0.0.1-SNAPSHOT.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
+
