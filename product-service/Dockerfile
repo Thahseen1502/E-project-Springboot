@@ -5,10 +5,24 @@
 #ENTRYPOINT ["java", "-jar", "/app.jar"]
 #
 
-# Build for product-service
-FROM maven:3.9-openjdk-17-slim
+# Reliable build for product-service
+FROM openjdk:17-jdk-slim
 
 WORKDIR /app
+
+# Install Maven
+RUN apt-get update && \
+    apt-get install -y wget && \
+    wget https://archive.apache.org/dist/maven/maven-3/3.9.4/binaries/apache-maven-3.9.4-bin.tar.gz && \
+    tar -xzf apache-maven-3.9.4-bin.tar.gz && \
+    mv apache-maven-3.9.4 /opt/maven && \
+    rm apache-maven-3.9.4-bin.tar.gz && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set Maven environment
+ENV MAVEN_HOME=/opt/maven
+ENV PATH="$MAVEN_HOME/bin:$PATH"
 
 # Copy pom.xml first for better caching
 COPY pom.xml .
