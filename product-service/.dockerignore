@@ -1,7 +1,5 @@
-# Maven
-target/
-!target/*.jar
-!target/**/target/*.jar
+# Maven (but keep source files for build)
+.mvn/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
