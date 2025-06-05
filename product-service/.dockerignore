@@ -1,6 +1,5 @@
-target/
+# Keep target/ included for non-multistage builds
 .git
 .gitignore
 Dockerfile
-docker-compose.yml
 README.md
