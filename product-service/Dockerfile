@@ -5,14 +5,14 @@
 #ENTRYPOINT ["java", "-jar", "/app.jar"]
 #
 
-# Multi-stage build for product-service
+# Multi-stage build - Skip protobuf issues
 FROM openjdk:17-jdk-slim as builder
 
 WORKDIR /app
 
-# Install Maven
+# Install Maven and basic tools
 RUN apt-get update && \
-    apt-get install -y wget && \
+    apt-get install -y wget curl && \
     wget https://archive.apache.org/dist/maven/maven-3/3.9.4/binaries/apache-maven-3.9.4-bin.tar.gz && \
     tar -xzf apache-maven-3.9.4-bin.tar.gz && \
     mv apache-maven-3.9.4 /opt/maven && \
@@ -23,32 +23,36 @@ RUN apt-get update && \
 ENV MAVEN_HOME=/opt/maven
 ENV PATH="$MAVEN_HOME/bin:$PATH"
 
-# Copy pom.xml and download dependencies first (for better caching)
+# Copy pom.xml and download dependencies
 COPY pom.xml .
 RUN mvn dependency:go-offline -B
 
 # Copy source code
 COPY src ./src
 
-# Build the application
-RUN mvn clean package -DskipTests -B
+# Build without protobuf plugin (skip it temporarily)
+RUN mvn clean package -DskipTests -B -Dprotobuf.skip=true
+
+# If the above fails, try this alternative
+# RUN mvn clean compile -DskipTests -B && mvn package -DskipTests -B -Dmaven.compile.skip=true
 
 # Runtime stage
 FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
-# Install protobuf for gRPC (if needed at runtime)
+# Install curl for health checks
 RUN apt-get update && \
-    apt-get install -y protobuf-compiler && \
+    apt-get install -y curl && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy the built jar from builder stage
 COPY --from=builder /app/target/product-service-*.jar app.jar
 
-# Create a non-root user
+# Create non-root user
 RUN addgroup --system spring && adduser --system spring --ingroup spring
+RUN chown spring:spring app.jar
 USER spring:spring
 
 # Expose ports
