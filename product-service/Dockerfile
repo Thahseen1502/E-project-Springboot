@@ -5,14 +5,14 @@
 #ENTRYPOINT ["java", "-jar", "/app.jar"]
 #
 
-# Multi-stage build for product-service
+# Simple build without protobuf issues
 FROM openjdk:17-jdk-slim as builder
 
 WORKDIR /app
 
-# Install Maven and required tools
+# Install Maven
 RUN apt-get update && \
-    apt-get install -y wget curl && \
+    apt-get install -y wget && \
     wget https://archive.apache.org/dist/maven/maven-3/3.9.4/binaries/apache-maven-3.9.4-bin.tar.gz && \
     tar -xzf apache-maven-3.9.4-bin.tar.gz && \
     mv apache-maven-3.9.4 /opt/maven && \
@@ -23,15 +23,12 @@ RUN apt-get update && \
 ENV MAVEN_HOME=/opt/maven
 ENV PATH="$MAVEN_HOME/bin:$PATH"
 
-# Copy pom.xml and download dependencies
+# Copy and build
 COPY pom.xml .
-RUN mvn dependency:go-offline -B
-
-# Copy source code
 COPY src ./src
 
-# Build the application - skip protobuf compilation since it's causing issues
-RUN mvn clean package -DskipTests -B -Dprotobuf.skip=true -Dmaven.proto.skip=true
+# Build without protobuf
+RUN mvn clean package -DskipTests -B
 
 # Runtime stage
 FROM openjdk:17-jdk-slim
@@ -44,7 +41,6 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy the built jar from builder stage
 COPY --from=builder /app/target/product-service-*.jar app.jar
 
 # Create non-root user
@@ -52,12 +48,9 @@ RUN addgroup --system spring && adduser --system spring --ingroup spring
 RUN chown spring:spring app.jar
 USER spring:spring
 
-# Expose ports
 EXPOSE 8082 9092
 
-# Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD curl -f http://localhost:8082/actuator/health || exit 1
 
-# Run the application
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
