@@ -1,61 +1,6 @@
-# Maven
 target/
-!target/*.jar
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
-
-# IDE
-.idea/
-*.iws
-*.iml
-*.ipr
-.vscode/
-.settings/
-.project
-.classpath
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Logs
-logs/
-*.log
-
-# Temporary files
-*.tmp
-*.swp
-*~
-
-# Git
-.git/
+.git
 .gitignore
+Dockerfile
+docker-compose.yml
 README.md
-
-# Docker
-Dockerfile*
-docker-compose*
-.dockerignore
-
-# Environment files
-.env
-.env.local
-.env.*.local
-
-# Node modules (if any)
-node_modules/
-
-# Build artifacts (except final jar)
-build/
-dist/
-
-# Test reports
-test-results/
-coverage/
