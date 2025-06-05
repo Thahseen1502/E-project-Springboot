@@ -5,48 +5,58 @@
 #ENTRYPOINT ["java", "-jar", "/app.jar"]
 #
 
-# gRPC-Ready build for product-service
-FROM openjdk:17-jdk-slim
+# Multi-stage build for product-service
+FROM openjdk:17-jdk-slim as builder
 
 WORKDIR /app
 
-# Install required tools for gRPC/protobuf
+# Install Maven
 RUN apt-get update && \
-    apt-get install -y \
-        wget \
-        unzip \
-        protobuf-compiler \
-        build-essential && \
+    apt-get install -y wget && \
+    wget https://archive.apache.org/dist/maven/maven-3/3.9.4/binaries/apache-maven-3.9.4-bin.tar.gz && \
+    tar -xzf apache-maven-3.9.4-bin.tar.gz && \
+    mv apache-maven-3.9.4 /opt/maven && \
+    rm apache-maven-3.9.4-bin.tar.gz && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Maven
-RUN wget https://archive.apache.org/dist/maven/maven-3/3.9.4/binaries/apache-maven-3.9.4-bin.tar.gz && \
-    tar -xzf apache-maven-3.9.4-bin.tar.gz && \
-    mv apache-maven-3.9.4 /opt/maven && \
-    rm apache-maven-3.9.4-bin.tar.gz
-
-# Set Maven environment
 ENV MAVEN_HOME=/opt/maven
 ENV PATH="$MAVEN_HOME/bin:$PATH"
 
-# Verify protoc installation
-RUN protoc --version
-
-# Copy pom.xml first for better caching
+# Copy pom.xml and download dependencies first (for better caching)
 COPY pom.xml .
-
-# Download dependencies
 RUN mvn dependency:go-offline -B
 
 # Copy source code
 COPY src ./src
 
-# Build the application with verbose output for debugging
-RUN mvn clean package -DskipTests -X
+# Build the application
+RUN mvn clean package -DskipTests -B
 
-# Expose the port
-EXPOSE 8082
+# Runtime stage
+FROM openjdk:17-jdk-slim
+
+WORKDIR /app
+
+# Install protobuf for gRPC (if needed at runtime)
+RUN apt-get update && \
+    apt-get install -y protobuf-compiler && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy the built jar from builder stage
+COPY --from=builder /app/target/product-service-*.jar app.jar
+
+# Create a non-root user
+RUN addgroup --system spring && adduser --system spring --ingroup spring
+USER spring:spring
+
+# Expose ports
+EXPOSE 8082 9092
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:8082/actuator/health || exit 1
 
 # Run the application
-CMD ["java", "-jar", "target/product-service-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/app.jar"]
