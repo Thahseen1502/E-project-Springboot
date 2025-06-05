@@ -10,9 +10,9 @@ FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
-# Install Maven
+# Install Maven and Protocol Buffers compiler
 RUN apt-get update && \
-    apt-get install -y wget && \
+    apt-get install -y wget protobuf-compiler && \
     wget https://archive.apache.org/dist/maven/maven-3/3.9.4/binaries/apache-maven-3.9.4-bin.tar.gz && \
     tar -xzf apache-maven-3.9.4-bin.tar.gz && \
     mv apache-maven-3.9.4 /opt/maven && \
