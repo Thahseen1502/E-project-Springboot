@@ -1,5 +1,6 @@
 # Maven
 target/
+!target/*.jar
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
@@ -16,94 +17,42 @@ buildNumber.properties
 *.iml
 *.ipr
 .vscode/
-.settings/
-.project
 .classpath
+.project
+.settings/
+bin/
 
 # OS
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 
 # Logs
 *.log
 logs/
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Coverage directory used by tools like istanbul
-coverage/
-
-# nyc test coverage
-.nyc_output
-
-# Grunt intermediate storage
-.grunt
-
-# Bower dependency directory
-bower_components
-
-# node_modules
-node_modules/
-
-# Optional npm cache directory
-.npm
-
-# Optional REPL history
-.node_repl_history
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# dotenv environment variables file
-.env
-.env.test
-.env.production
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Docker
-.dockerignore
-Dockerfile
-docker-compose.yml
-*.dockerfile
-
-# Git
-.git
-.gitignore
-README.md
-.gitattributes
-
 # Temporary files
 *.tmp
 *.temp
+.tmp/
+.temp/
 
-# Test files (if you don't want to include them)
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentation
+README.md
+*.md
+
+# Test files
 src/test/
 
-# Frontend files (not needed for backend service)
-frontend/
-css/
-js/
-*.html
-
-# Caddy files
-Caddyfile
-
-# Other microservices (when building product-service)
+# Other services
 user-service/
 order-service/
 eureka-service/
