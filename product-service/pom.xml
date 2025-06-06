@@ -173,6 +173,7 @@
 				<artifactId>protobuf-maven-plugin</artifactId>
 				<version>0.6.1</version>
 				<configuration>
+					<skip>true</skip><!-- added this line for render deployment-->
 					<!-- Use a fixed value instead of ${os.detected.classifier} -->
 					<protocArtifact>com.google.protobuf:protoc:3.19.4:exe:windows-x86_64</protocArtifact>
 					<pluginId>grpc-java</pluginId>
