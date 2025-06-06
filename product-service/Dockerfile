@@ -9,24 +9,23 @@ FROM maven:3.9.4-eclipse-temurin-17 as builder
 
 WORKDIR /app
 
-# Copy pom.xml and download dependencies
+# Copy pom.xml and modify it to skip protobuf compilation
 COPY pom.xml .
-RUN mvn dependency:go-offline -B
-
-# Copy source and build
 COPY src ./src
-RUN mvn clean package -DskipTests
+
+# Skip protobuf compilation for now and build
+RUN mvn clean package -DskipTests -Dprotobuf.skip=true
 
 # ====== Stage 2: Run the app ======
 FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
-# Copy jar file
+# Copy the jar file from builder stage
 COPY --from=builder /app/target/product-service-0.0.1-SNAPSHOT.jar app.jar
 
-# Expose port
+# Expose the ports
 EXPOSE 8082
 
-# Run application
+# Run the application
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
