@@ -7,25 +7,65 @@
 # ====== Stage 1: Build the jar ======
 FROM maven:3.9.4-eclipse-temurin-17 as builder
 
+# Install protobuf compiler
+RUN apt-get update && \
+    apt-get install -y wget unzip && \
+    wget https://github.com/protocolbuffers/protobuf/releases/download/v3.25.1/protoc-3.25.1-linux-x86_64.zip && \
+    unzip protoc-3.25.1-linux-x86_64.zip -d /tmp/protoc && \
+    mv /tmp/protoc/bin/protoc /usr/local/bin/ && \
+    mv /tmp/protoc/include/* /usr/local/include/ && \
+    rm -rf /tmp/protoc protoc-3.25.1-linux-x86_64.zip && \
+    chmod +x /usr/local/bin/protoc && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Verify protoc installation
+RUN protoc --version
+
+# Set working directory
 WORKDIR /app
 
-# Copy pom.xml and modify it to skip protobuf compilation
+# Copy pom.xml first for better layer caching
 COPY pom.xml .
+
+# Download dependencies
+RUN mvn dependency:go-offline -B
+
+# Copy source code
 COPY src ./src
 
-# Skip protobuf compilation for now and build
-RUN mvn clean package -DskipTests -Dprotobuf.skip=true
+# Build the application with protobuf compilation
+RUN mvn clean compile && mvn package -DskipTests
 
 # ====== Stage 2: Run the app ======
 FROM openjdk:17-jdk-slim
+
+# Install curl for health checks
+RUN apt-get update && \
+    apt-get install -y curl && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create non-root user for security
+RUN groupadd -r appuser && useradd -r -g appuser appuser
 
 WORKDIR /app
 
 # Copy the jar file from builder stage
 COPY --from=builder /app/target/product-service-0.0.1-SNAPSHOT.jar app.jar
 
+# Change ownership to non-root user
+RUN chown -R appuser:appuser /app
+
+# Switch to non-root user
+USER appuser
+
 # Expose the ports
-EXPOSE 8082
+EXPOSE 8082 9092
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:8082/actuator/health || exit 1
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
