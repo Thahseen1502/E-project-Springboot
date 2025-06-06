@@ -1,9 +1,7 @@
 target/
 .git
 .gitignore
-*.iml
-.idea/
-*.log
+README.md
 Dockerfile
 docker-compose.yml
-README.md
+Caddyfile
