@@ -1,6 +1,56 @@
+# Maven
 target/
-.git/
+!target/*.jar
+!target/**/target/*.jar
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE
 .idea/
+*.iws
+*.iml
+*.ipr
 .vscode/
+.classpath
+.project
+.settings/
+bin/
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Logs
 *.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# Git
+.git/
+.gitignore
+
+# Docker
+docker-compose.yml
+.dockerignore
+
+# Documentation
+README.md
+*.md
+
+# Node modules (if any)
+node_modules/
+
+# Test files
+src/test/
