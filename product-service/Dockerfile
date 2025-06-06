@@ -7,15 +7,6 @@
 # ====== Stage 1: Build the jar ======
 FROM maven:3.9.4-eclipse-temurin-17 as builder
 
-# Install protoc (Protobuf compiler) with updated URL
-RUN apt-get update && \
-    apt-get install -y unzip wget curl && \
-    wget https://github.com/protocolbuffers/protobuf/releases/download/v25.1/protoc-25.1-linux-x86_64.zip && \
-    unzip protoc-25.1-linux-x86_64.zip -d /usr/local && \
-    rm protoc-25.1-linux-x86_64.zip && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
 # Set working directory
 WORKDIR /app
 
@@ -33,6 +24,12 @@ RUN mvn clean package -DskipTests
 
 # ====== Stage 2: Run the app ======
 FROM openjdk:17-jdk-slim
+
+# Install curl for health checks
+RUN apt-get update && \
+    apt-get install -y curl && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Create non-root user for security
 RUN groupadd -r appuser && useradd -r -g appuser appuser
