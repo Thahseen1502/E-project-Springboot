@@ -9,11 +9,12 @@ FROM maven:3.9.4-eclipse-temurin-17 AS builder
 
 RUN apt-get update && \
     apt-get install -y wget unzip && \
-    PROTOC_VERSION=3.21.12 && \
+    PROTOC_VERSION=3.21.9 && \
     wget https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip && \
     unzip protoc-${PROTOC_VERSION}-linux-x86_64.zip -d /usr/local && \
     rm protoc-${PROTOC_VERSION}-linux-x86_64.zip && \
     apt-get clean
+
 
 WORKDIR /app
 COPY . .
