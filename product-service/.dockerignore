@@ -1,51 +1,30 @@
+# Ignore everything in target except the jar
+target/*
+!target/product-service-0.0.1-SNAPSHOT.jar
+
 # Maven
-target/
-!target/*.jar
-!target/**/target/*.jar
-pom.xml.tag
-pom.xml.releaseBackup
+.mvn/
 pom.xml.versionsBackup
-pom.xml.next
 release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
 
-# IDE
+# IDE and editor folders/files
 .idea/
-*.iws
 *.iml
-*.ipr
 .vscode/
-.classpath
-.project
-.settings/
-bin/
 
-# OS
+# System
 .DS_Store
 Thumbs.db
-
-# Logs
-*.log
-logs/
-
-# Temporary files
-*.tmp
-*.temp
-.tmp/
-.temp/
 
 # Git
 .git/
 .gitignore
 
-# Docker
-Dockerfile
+# Docker-related
 docker-compose.yml
+Dockerfile
 .dockerignore
 
-# Documentation
-README.md
-*.md
+# Logs
+*.log
+logs/
