@@ -7,12 +7,12 @@
 # ====== Stage 1: Build the jar ======
 FROM maven:3.9.4-eclipse-temurin-17 as builder
 
-# Install protoc (Protobuf compiler) - only if you're using protobuf
+# Install protoc (Protobuf compiler) with updated URL
 RUN apt-get update && \
-    apt-get install -y unzip wget && \
-    wget https://github.com/protocolbuffers/protobuf/releases/download/v3.21.12/protoc-3.21.12-linux-x86_64.zip && \
-    unzip protoc-3.21.12-linux-x86_64.zip -d /usr/local && \
-    rm protoc-3.21.12-linux-x86_64.zip && \
+    apt-get install -y unzip wget curl && \
+    wget https://github.com/protocolbuffers/protobuf/releases/download/v25.1/protoc-25.1-linux-x86_64.zip && \
+    unzip protoc-25.1-linux-x86_64.zip -d /usr/local && \
+    rm protoc-25.1-linux-x86_64.zip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -57,4 +57,3 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
-
