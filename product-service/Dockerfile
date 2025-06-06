@@ -4,25 +4,19 @@
 #COPY target/product-service-0.0.1-SNAPSHOT.jar app.jar
 #ENTRYPOINT ["java", "-jar", "/app.jar"]
 
-# ====== Stage 1: Build the jar ======
-FROM maven:3.9.4-eclipse-temurin-17 as builder
+# Since Maven build is failing, let's try building locally first
+# This is a temporary solution
 
-WORKDIR /app
-
-# Copy your pom.xml and source code exactly as they are
-COPY pom.xml .
-COPY src ./src
-
-# Just build with skip tests - don't touch anything else
-RUN mvn clean package -DskipTests
-
-# ====== Stage 2: Run the app ======
 FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
-# Copy the jar file
-COPY --from=builder /app/target/product-service-0.0.1-SNAPSHOT.jar app.jar
+# For now, you'll need to build the JAR locally and copy it
+# Run this command locally on your machine first:
+# mvn clean package -DskipTests -Dprotobuf.skip=true
+
+# Then copy your pre-built JAR file
+COPY target/product-service-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose port
 EXPOSE 8082
