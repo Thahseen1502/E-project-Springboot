@@ -7,28 +7,29 @@
 # ====== Stage 1: Build the jar ======
 FROM maven:3.9.4-eclipse-temurin-17 as builder
 
-# Install protobuf compiler
+# Install protobuf using package manager (more reliable)
 RUN apt-get update && \
-    apt-get install -y wget unzip && \
-    wget https://github.com/protocolbuffers/protobuf/releases/download/v3.25.1/protoc-3.25.1-linux-x86_64.zip && \
-    unzip protoc-3.25.1-linux-x86_64.zip -d /tmp/protoc && \
-    mv /tmp/protoc/bin/protoc /usr/local/bin/ && \
-    mv /tmp/protoc/include/* /usr/local/include/ && \
-    rm -rf /tmp/protoc protoc-3.25.1-linux-x86_64.zip && \
-    chmod +x /usr/local/bin/protoc && \
+    apt-get install -y protobuf-compiler && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# Verify protoc installation
+RUN protoc --version
 
 # Set working directory
 WORKDIR /app
 
-# Copy everything first
-COPY . .
+# Copy pom.xml first for better caching
+COPY pom.xml .
 
-# Try to build with protobuf compilation, if it fails, skip protobuf plugin
-RUN mvn clean compile || echo "Protobuf compilation failed, trying without it..." && \
-    mvn clean package -DskipTests -Dprotobuf.skip=true || \
-    mvn clean package -DskipTests -Dmaven.plugin.validation=NONE
+# Download dependencies
+RUN mvn dependency:go-offline -B || true
+
+# Copy source code
+COPY src ./src
+
+# Build the application
+RUN mvn clean package -DskipTests
 
 # ====== Stage 2: Run the app ======
 FROM openjdk:17-jdk-slim
@@ -42,14 +43,14 @@ RUN apt-get update && \
 WORKDIR /app
 
 # Copy the jar file from builder stage
-COPY --from=builder /app/target/*.jar app.jar
+COPY --from=builder /app/target/product-service-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose the ports
-EXPOSE 8082 9092
+EXPOSE 8082
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD curl -f http://localhost:8082/actuator/health || exit 1
 
-# Run the application
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+# Run the application with proper JVM settings for containers
+ENTRYPOINT ["java", "-Xmx512m", "-Xms256m", "-jar", "/app/app.jar"]
