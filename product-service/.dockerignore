@@ -1,30 +1,6 @@
-# Ignore everything in target except the jar
-target/*
-!target/product-service-0.0.1-SNAPSHOT.jar
-
-# Maven
-.mvn/
-pom.xml.versionsBackup
-release.properties
-
-# IDE and editor folders/files
-.idea/
-*.iml
-.vscode/
-
-# System
-.DS_Store
-Thumbs.db
-
-# Git
+target/
 .git/
-.gitignore
-
-# Docker-related
-docker-compose.yml
-Dockerfile
-.dockerignore
-
-# Logs
+.idea/
+.vscode/
+.DS_Store
 *.log
-logs/
