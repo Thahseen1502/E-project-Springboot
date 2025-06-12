@@ -5,18 +5,16 @@
 #ENTRYPOINT ["java", "-jar", "/app.jar"]
 #
 
-# Use OpenJDK 17 slim image
-FROM openjdk:17-jdk-slim
-
-# Set the working directory
+# Stage 1: Build the application
+FROM maven:3.8.5-openjdk-17 AS builder
 WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
 
-# Copy only the built JAR
-COPY target/product-service-0.0.1-SNAPSHOT.jar app.jar
-
-# Expose port
+# Stage 2: Use a smaller image to run the app
+FROM openjdk:17-jdk-slim
+WORKDIR /app
+COPY --from=builder /app/target/product-service-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8082
-
-# Run the jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
 
