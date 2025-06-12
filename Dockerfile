@@ -1,14 +1,26 @@
-# Use the official Caddy builder image so we can run as root
-FROM caddy:builder AS builder
+# Step 1: Build Caddy with plugins (optional)
+FROM golang:1.20 as builder
 
-# Copy site content and Caddyfile into builder image
+RUN git clone https://github.com/caddyserver/caddy.git && \
+    cd caddy/cmd/caddy && \
+    go build -o /caddy
+
+# Step 2: Create minimal runtime image
+FROM debian:bullseye-slim
+
+# Install dependencies
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+
+# Copy Caddy binary from builder
+COPY --from=builder /caddy /usr/bin/caddy
+
+# Copy site files and Caddyfile
 COPY frontend /srv/frontend
 COPY Caddyfile /etc/caddy/Caddyfile
 
-# Build final image with full permissions
-FROM caddy:latest
+# Set permissions and default command
+RUN chmod +x /usr/bin/caddy
 
-COPY --from=builder /srv/frontend /srv/frontend
-COPY --from=builder /etc/caddy/Caddyfile /etc/caddy/Caddyfile
+EXPOSE 80
 
 CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]

@@ -4,5 +4,5 @@ root * /srv/frontend
 file_server
 
 handle_path /api/* {
-    reverse_proxy https://api-gateway-service-nb2g.onrender.com
+    reverse_proxy https://your-api-gateway-service.onrender.com
 }
