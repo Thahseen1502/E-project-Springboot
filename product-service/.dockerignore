@@ -1,10 +1,8 @@
-target/
+# Ignore everything inside target except jar
+target/*
 !target/product-service-0.0.1-SNAPSHOT.jar
 
+# Others
 .git
-*.log
-*.md
+*.iml
 .idea/
-.vscode/
-.DS_Store
-Dockerfile

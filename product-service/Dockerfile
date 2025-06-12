@@ -5,6 +5,7 @@
 #ENTRYPOINT ["java", "-jar", "/app.jar"]
 #
 
+# product-service/Dockerfile
 FROM openjdk:17-jdk-slim
 VOLUME /tmp
 EXPOSE 8082
