@@ -10,6 +10,24 @@
 #
 
 
+FROM maven:3.9.4-openjdk-17-slim AS build
+
+# Set the working directory
+WORKDIR /app
+
+# Copy pom.xml first (for better caching)
+COPY pom.xml .
+
+# Download dependencies (this layer will be cached if pom.xml doesn't change)
+RUN mvn dependency:go-offline -B
+
+# Copy source code
+COPY src ./src
+
+# Build the application
+RUN mvn clean package -DskipTests
+
+# Runtime stage
 FROM openjdk:17-jdk-slim
 
 # Install netcat for health checks (optional but useful)
@@ -20,8 +38,8 @@ VOLUME /tmp
 # Create app directory
 WORKDIR /app
 
-# Copy the JAR file
-COPY target/order-service-0.0.1-SNAPSHOT.jar app.jar
+# Copy the JAR file from build stage
+COPY --from=build /app/target/order-service-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose both HTTP and gRPC ports
 EXPOSE 8083 9093

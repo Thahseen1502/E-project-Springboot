@@ -1,4 +1,4 @@
-# Maven
+# Maven build artifacts (but allow source files for Docker build)
 target/
 !target/*.jar
 !target/*/*.jar
