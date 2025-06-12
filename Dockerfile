@@ -1,10 +1,13 @@
 FROM caddy:alpine
 
-# Copy your Caddyfile
+# Copy your Caddyfile to the official config location
 COPY Caddyfile /etc/caddy/Caddyfile
 
 # Copy frontend static files
 COPY frontend/ /srv/frontend/
 
-# Run Caddy as root (Render requires it)
-USER root
+# Set working directory (optional)
+WORKDIR /srv
+
+# Run Caddy manually (Render needs this!)
+CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
