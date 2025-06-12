@@ -5,10 +5,21 @@
 #ENTRYPOINT ["java", "-jar", "/app.jar"]
 #
 
-# Stage 1: Build the application
+# Stage 1: Build the application with Maven and Protobuf
 FROM maven:3.8.5-openjdk-17 AS builder
+
 WORKDIR /app
 COPY . .
+
+# Install protoc
+RUN apt-get update && \
+    apt-get install -y unzip wget && \
+    wget https://github.com/protocolbuffers/protobuf/releases/download/v3.21.12/protoc-3.21.12-linux-x86_64.zip && \
+    unzip protoc-3.21.12-linux-x86_64.zip -d /usr/local && \
+    chmod +x /usr/local/bin/protoc && \
+    rm -rf protoc-3.21.12-linux-x86_64.zip
+
+# Build the project
 RUN mvn clean package -DskipTests
 
 # Stage 2: Use a smaller image to run the app
