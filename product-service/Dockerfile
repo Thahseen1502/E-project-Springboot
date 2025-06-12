@@ -5,14 +5,17 @@
 #ENTRYPOINT ["java", "-jar", "/app.jar"]
 #
 
-FROM openjdk:17-jdk-slim
+FROM maven:3.8-openjdk-17 AS build
 WORKDIR /app
-RUN apt-get update && apt-get install -y maven
 COPY pom.xml .
 COPY src ./src
-RUN mvn clean package -DskipTests
+RUN mvn clean package -DskipTests -DskipProtobuf=true
+
+FROM openjdk:17-jdk-slim
+WORKDIR /app
+COPY --from=build /app/target/product-service-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8082
-ENTRYPOINT ["java", "-jar", "target/product-service-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
 
 
 
