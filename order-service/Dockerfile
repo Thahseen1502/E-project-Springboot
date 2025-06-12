@@ -12,12 +12,6 @@
 
 FROM maven:3.9.5-eclipse-temurin-17-alpine AS build
 
-# Install protobuf compiler and dependencies
-RUN apk add --no-cache \
-    protobuf \
-    protobuf-dev \
-    build-base
-
 # Set the working directory
 WORKDIR /app
 
@@ -30,8 +24,8 @@ RUN mvn dependency:go-offline -B
 # Copy source code
 COPY src ./src
 
-# Build the application with protobuf support
-RUN mvn clean package -DskipTests -Dprotobuf.skip=false
+# Build the application - skip protobuf compilation
+RUN mvn clean package -DskipTests -Dprotobuf.skip=true
 
 # Runtime stage
 FROM eclipse-temurin:17-jre-alpine
