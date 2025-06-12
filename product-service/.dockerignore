@@ -1,4 +1,4 @@
-# Ignore everything inside target except jar
+# Allow only the final jar file in target
 target/*
 !target/product-service-0.0.1-SNAPSHOT.jar
 
