@@ -1,20 +1,19 @@
 FROM debian:bullseye-slim
 
-# Install curl and unzip to fetch caddy binary
+# Install required packages
 RUN apt-get update && apt-get install -y curl unzip ca-certificates && rm -rf /var/lib/apt/lists/*
 
-# Download and install Caddy binary
-RUN curl -fsSL https://github.com/caddyserver/caddy/releases/latest/download/caddy_linux_amd64.tar.gz | tar -xz -C /usr/bin caddy
+# Download latest Caddy binary (correct name)
+RUN curl -LO https://github.com/caddyserver/caddy/releases/latest/download/caddy_2_linux_amd64.tar.gz && \
+    tar -xzf caddy_2_linux_amd64.tar.gz && \
+    mv caddy /usr/bin/caddy && \
+    chmod +x /usr/bin/caddy && \
+    rm caddy_2_linux_amd64.tar.gz
 
-# Copy frontend and Caddyfile
+# Copy frontend files and Caddyfile
 COPY frontend /srv/frontend
 COPY Caddyfile /etc/caddy/Caddyfile
 
-# Give permissions
-RUN chmod +x /usr/bin/caddy
-
-# Expose HTTP
 EXPOSE 80
 
-# Start Caddy
 CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
