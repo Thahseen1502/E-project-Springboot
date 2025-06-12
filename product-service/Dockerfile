@@ -6,7 +6,7 @@
 #
 
 # Multi-stage build Dockerfile
-FROM maven:3.9.4-openjdk-17 AS build
+FROM maven:3.8-openjdk-17 AS build
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
@@ -17,7 +17,6 @@ WORKDIR /app
 COPY --from=build /app/target/product-service-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8082
 ENTRYPOINT ["java", "-jar", "app.jar"]
-
 
 
 
