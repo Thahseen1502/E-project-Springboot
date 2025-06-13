@@ -1,8 +1,9 @@
-:80
+https://caddy-ktfj.onrender.com {
 
-root * /srv/frontend
-file_server
+    root * /srv/frontend
+    file_server
 
-handle_path /api/* {
-    reverse_proxy https://api-gateway-service-nb2g.onrender.com
+    handle_path /api/* {
+        reverse_proxy https://api-gateway-service-nb2g.onrender.com
+    }
 }
