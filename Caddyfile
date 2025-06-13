@@ -1,9 +1,17 @@
-https://caddy-ktfj.onrender.com {
+caddy-ktfj.onrender.com {
 
     root * /srv/frontend
     file_server
 
     handle_path /api/* {
         reverse_proxy https://api-gateway-service-nb2g.onrender.com
+    }
+
+    handle_options /api/* {
+        respond 204 {
+            header Access-Control-Allow-Origin *
+            header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+            header Access-Control-Allow-Headers *
+        }
     }
 }
