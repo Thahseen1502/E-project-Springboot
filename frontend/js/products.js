@@ -160,8 +160,8 @@
     });
   });
 
-  const apiUrl = "/api/products";
-
+//  const apiUrl = "/api/products";
+const apiUrl = "https://product-service-e0nd.onrender.com/api/products";
   async function loadProducts() {
     try {
       const response = await fetch(apiUrl);
