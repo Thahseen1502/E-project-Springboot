@@ -3,8 +3,8 @@ caddy-ktfj.onrender.com {
     root * /srv/frontend
     file_server
 
-    # Forward API requests to your API Gateway
-    handle_path /api/* {
+    # Fix: Use handle instead of handle_path
+    handle /api/* {
         reverse_proxy https://api-gateway-service-nb2g.onrender.com
     }
-
+}
