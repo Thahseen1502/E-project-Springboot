@@ -104,8 +104,8 @@
 //
 
 
-//  const apiUrl = "/api/users";
-  const apiUrl = "https://your-api-gateway.onrender.com/api/users";
+  const apiUrl = "/api/users";
+//  const apiUrl = "https://your-api-gateway.onrender.com/api/users";
 
 
   document.addEventListener("DOMContentLoaded", () => {
