@@ -1,5 +1,4 @@
-:80 {
-
+http://caddy-ktfj.onrender.com {
     root * /srv/frontend
     file_server
 
